@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>錬成アプリ</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  margin-top: 40px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+button {
+  margin: 10px;
+  padding: 15px 25px;
+  font-size: 18px;
+}
+
+.value {
+  font-size: 20px;
+  margin: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>錬成アプリ</h1>
+
+<!-- 表示 -->
+<div class="value">体力錬成：<span id="physical">0</span></div>
+<div class="value">英語錬成：<span id="english">0</span></div>
+<div class="value">その他：<span id="other">0</span></div>
+<div class="value">残高：<span id="balance">0</span></div>
+<div class="value">当日獲得：<span id="daily">0</span></div>
+
+<!-- ボタン -->
+<button onclick="add('physical')">体力錬成</button>
+<button onclick="add('english')">英語錬成</button>
+<button onclick="add('other')">その他</button>
+<br>
+<button onclick="useBalance()">残高を使う</button>
+
+<script>
+let data = JSON.parse(localStorage.getItem("appData")) || {
+  physical: 0,
+  english: 0,
+  other: 0,
+  balance: 0,
+  daily: 0,
+  lastDate: new Date().toDateString()
+};
+
+// 日付チェック（24時リセット）
+function checkDate() {
+  const today = new Date().toDateString();
+  if (data.lastDate !== today) {
+    data.daily = 0;
+    data.lastDate = today;
+  }
+}
+
+// 錬成（体力・英語・その他）
+function add(type) {
+  checkDate();
+
+  data[type]++;
+  data.daily++;     // 当日獲得 +1
+  data.balance++;   // 残高 +1
+
+  save();
+}
+
+// 残高使用
+function useBalance() {
+  if (data.balance > 0) {
+    data.balance--;
+    save();
+  }
+}
+
+// 保存＆表示更新
+function save() {
+  localStorage.setItem("appData", JSON.stringify(data));
+
+  document.getElementById("physical").textContent = data.physical;
+  document.getElementById("english").textContent = data.english;
+  document.getElementById("other").textContent = data.other;
+  document.getElementById("balance").textContent = data.balance;
+  document.getElementById("daily").textContent = data.daily;
+}
+
+// 初期化
+checkDate();
+save();
+</script>
+
+</body>
+</html>
